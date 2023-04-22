@@ -11,9 +11,12 @@ body {
   width: 100vw;
   overflow: hidden;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: rgb(106, 99, 212);
   background: linear-gradient(
-    90deg,
+    111 90deg,
     rgba(106, 99, 212, 1) 0%,
     rgba(186, 236, 194, 1) 0%,
     rgba(105, 216, 238, 1) 100%
