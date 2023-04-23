@@ -27,9 +27,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  height: 100%;
   .changed-preferences {
     display: flex;
     gap: 2rem;
+    flex: 1 1 auto;
+    overflow-y: scroll;
   }
 `;
 

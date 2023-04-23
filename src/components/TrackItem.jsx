@@ -1,8 +1,14 @@
 import React from "react";
+import axios from "../axios";
+import { toast } from "react-toastify";
 
 import playIcon from "../assets/playButton.png";
 import playGif from "../assets/musicPlay.gif";
+import addIcon from "../assets/add.png";
+import addedIcon from "../assets/check.png";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/slices/authSlice";
 
 const useAudio = (audio, activeTrack) => {
   const [playing, setPlaying] = React.useState(false);
@@ -27,10 +33,28 @@ const useAudio = (audio, activeTrack) => {
 };
 
 function TrackItem({ track, activeTrack, changeActiveTrack }) {
+  const dispatch = useDispatch();
+  const userData = useSelector((store) => store.auth.data);
+  const [isAdded, setIsAdded] = React.useState(false);
+
+  React.useEffect(() => {
+    if (userData?.likedTrack) {
+      setIsAdded(
+        (userData.likedTrack.find((item) => item._id === track._id) && true) ||
+          false
+      );
+    }
+  }, [userData]);
+
   const [audio] = React.useState(
     new Audio(`http://localhost:8000${track.trackUrl}`)
   );
   const [duration, setDuration] = React.useState("");
+
+  const [playing, toggle, pause] = useAudio(audio, activeTrack);
+  if (activeTrack !== track._id && playing) {
+    pause();
+  }
 
   React.useEffect(() => {
     audio.onloadedmetadata = () => {
@@ -38,19 +62,31 @@ function TrackItem({ track, activeTrack, changeActiveTrack }) {
       const seconds = Math.round(audio.duration - minutes * 60);
       setDuration(minutes + ":" + seconds);
     };
-  });
 
-  const [playing, toggle, pause] = useAudio(audio, activeTrack);
-  if (activeTrack !== track._id && playing) {
-    pause();
-  }
+    return () => {
+      audio.pause();
+    };
+  }, []);
+
   const onPlayClickHandler = () => {
     changeActiveTrack(track._id);
     toggle();
   };
 
+  const addTrackHandler = () => {
+    if (!isAdded) {
+      axios.patch("/auth/track", { track }).then((res) => {
+        dispatch(login(res.data));
+      });
+    } else {
+      axios.delete(`/auth/track/${track._id}`).then((res) => {
+        dispatch(login(res.data));
+      });
+    }
+  };
+
   return (
-    <>
+    <TrackContainer>
       <Container onClick={onPlayClickHandler}>
         <div className={`track-preview ${playing && "active"}`}>
           <img src={playIcon} alt="" className="play-icon" />
@@ -65,11 +101,35 @@ function TrackItem({ track, activeTrack, changeActiveTrack }) {
           <p>{duration}</p>
         </div>
       </Container>
-    </>
+      <button className="add" onClick={addTrackHandler}>
+        {!isAdded ? (
+          <img src={addIcon} alt="" />
+        ) : (
+          <img src={addedIcon} alt="" />
+        )}
+      </button>
+    </TrackContainer>
   );
 }
 
+const TrackContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  .add {
+    height: 2rem;
+    cursor: pointer;
+    background: none;
+    border: none;
+    img {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+`;
+
 const Container = styled.div`
+  flex: 1 1 auto;
   display: flex;
   gap: 1rem;
   align-items: center;

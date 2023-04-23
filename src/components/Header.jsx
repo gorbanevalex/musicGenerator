@@ -17,8 +17,8 @@ const menuItem = [
     id: 0,
   },
   {
-    name: "Генератор",
-    link: "/music",
+    name: "Мой плейлист",
+    link: "/playlist",
     icon: musicIcon,
     id: 1,
   },
@@ -57,9 +57,12 @@ function Header() {
 const Container = styled.div`
   border-right: 2px solid #7b74d5;
   padding-right: 1rem;
-  height: 100%;
+  height: 90%;
   display: flex;
   flex-direction: column;
+  position: fixed;
+  left: 3%;
+  top: 4%;
   .menu {
     display: flex;
     flex-direction: column;

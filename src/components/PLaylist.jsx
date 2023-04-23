@@ -1,24 +1,17 @@
 import React from "react";
-import axios from "../axios";
-
-import styled from "styled-components";
 import { useSelector } from "react-redux";
+import styled from "styled-components";
 import TrackItem from "./TrackItem";
 
-function ChangeTrack() {
+function PLaylist() {
   const userData = useSelector((store) => store.auth.data);
-  const [allTracks, setAllTracks] = React.useState([]);
-  const [userTracks, setUserTracks] = React.useState([]);
-  const [activeTrack, setActiveTrack] = React.useState();
+  const [tracks, setTracks] = React.useState([]);
+  const [activeTrack, setActiveTrack] = React.useState("");
   const [searchValue, setSearchValue] = React.useState("");
-
-  const tracksNotAdded = allTracks.filter((item) => {
-    return userTracks.indexOf(item) === -1;
-  });
 
   const filteredSearchTracks =
     searchValue.length > 0
-      ? tracksNotAdded.filter((item) => {
+      ? tracks.filter((item) => {
           let flag = false;
           item.author.map((authorItem) => {
             if (
@@ -34,23 +27,17 @@ function ChangeTrack() {
           }
           return flag;
         })
-      : tracksNotAdded;
+      : tracks;
 
   React.useEffect(() => {
     if (userData?.likedTrack) {
-      setUserTracks(userData.likedTrack);
+      setTracks(userData.likedTrack);
     }
   }, [userData]);
 
-  React.useEffect(() => {
-    axios.get("/track/all").then((res) => {
-      setAllTracks(res.data);
-    });
-  }, []);
   return (
     <Container>
-      <h3>Добавьте любимую музыку</h3>
-      <div className="search">
+      <div className="playlist-search">
         <input
           type="text"
           placeholder="Название или автор"
@@ -67,20 +54,19 @@ function ChangeTrack() {
             changeActiveTrack={setActiveTrack}
           />
         ))}
+        {tracks.length === 0 && (
+          <p className="empty-list">
+            Добавьте музыку в свой плейлист во вкладке "Профиль"
+          </p>
+        )}
       </div>
     </Container>
   );
 }
 
 const Container = styled.div`
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  h3 {
-    font-size: 1rem;
-  }
-  .search {
-    margin-top: 0.5rem;
+  padding-left: 1rem;
+  .playlist-search {
     input {
       width: 100%;
       padding: 1rem;
@@ -93,22 +79,12 @@ const Container = styled.div`
   }
   .content {
     margin-top: 1rem;
-    overflow-y: scroll;
-    flex: 1 1 auto;
-    &::-webkit-scrollbar {
-      width: 4px;
-      &-thumb {
-        width: 1px;
-        background: rgb(106, 99, 212);
-        background: linear-gradient(
-          90deg,
-          #a8a6c0 0%,
-          #d0edd5 0%,
-          #e3f6fa 100%
-        );
-      }
+    .empty-list {
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
     }
   }
 `;
 
-export default ChangeTrack;
+export default PLaylist;

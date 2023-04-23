@@ -87,8 +87,21 @@ const Container = styled.div`
     flex-direction: column;
     max-width: 200px;
     gap: 0.5rem;
-    height: 14rem;
+    max-height: 14rem;
     overflow-y: scroll;
+    &::-webkit-scrollbar {
+      width: 4px;
+      &-thumb {
+        width: 1px;
+        background: rgb(106, 99, 212);
+        background: linear-gradient(
+          90deg,
+          #a8a6c0 0%,
+          #d0edd5 0%,
+          #e3f6fa 100%
+        );
+      }
+    }
   }
   .genre {
     text-align: left;

@@ -12,7 +12,7 @@ function App() {
         <Route path="/track-add" element={<TrackAdding />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<CheckAuth />} />
+        <Route path="*" element={<CheckAuth />} />
       </Routes>
     </BrowserRouter>
   );

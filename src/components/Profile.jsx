@@ -29,6 +29,9 @@ function Profile() {
 
 const Container = styled.div`
   padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   .welcome {
     text-align: center;
     h2 {
@@ -37,6 +40,9 @@ const Container = styled.div`
         color: #7b74d5;
       }
     }
+  }
+  .profile-main {
+    flex: 1 1 auto;
   }
 `;
 
