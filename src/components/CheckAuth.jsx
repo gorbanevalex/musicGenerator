@@ -4,19 +4,28 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import axios from "../axios";
 import { login } from "../redux/slices/authSlice";
 
+import { io } from "socket.io-client";
+
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import styled from "styled-components";
 import Profile from "./Profile";
 import Header from "./Header";
 import PLaylist from "./PLaylist";
+import RoomsList from "./RoomsList";
+import Room from "./Room";
 
 function CheckAuth() {
   const dispatch = useDispatch();
+  const socket = React.useRef();
 
   React.useState(() => {
     if (window.localStorage.getItem("token")) {
       axios.get("/auth/me").then((res) => {
         dispatch(login(res.data));
       });
+      socket.current = io("http://localhost:8000");
     }
   });
 
@@ -24,17 +33,22 @@ function CheckAuth() {
     return <Navigate to="/login" />;
   }
   return (
-    <Container>
-      <div className="header-block">
-        <Header />
-      </div>
-      <div className="content-block">
-        <Routes>
-          <Route path="/" element={<Profile />} />
-          <Route path="playlist" element={<PLaylist />} />
-        </Routes>
-      </div>
-    </Container>
+    <>
+      <Container>
+        <div className="header-block">
+          <Header />
+        </div>
+        <div className="content-block">
+          <Routes>
+            <Route path="/" element={<Profile />} />
+            <Route path="playlist" element={<PLaylist />} />
+            <Route path="rooms" element={<RoomsList />} />
+            <Route path="rooms/:id" element={<Room socket={socket} />} />
+          </Routes>
+        </div>
+      </Container>
+      <ToastContainer />
+    </>
   );
 }
 

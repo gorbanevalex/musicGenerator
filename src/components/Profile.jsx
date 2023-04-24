@@ -4,9 +4,6 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 import ProfileMain from "./ProfileMain";
 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
 function Profile() {
   const userData = useSelector((store) => store.auth.data);
   return (
@@ -22,7 +19,6 @@ function Profile() {
           <ProfileMain />
         </div>
       </Container>
-      <ToastContainer />
     </>
   );
 }

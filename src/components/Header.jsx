@@ -4,6 +4,7 @@ import styled from "styled-components";
 import userIcon from "../assets/userIcon.png";
 import musicIcon from "../assets/musicIcon.png";
 import exitIcon from "../assets/exitIcon.png";
+import roomIcon from "../assets/roomIcon.png";
 
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -21,6 +22,12 @@ const menuItem = [
     link: "/playlist",
     icon: musicIcon,
     id: 1,
+  },
+  {
+    name: "Комнаты",
+    link: "/rooms",
+    icon: roomIcon,
+    id: 2,
   },
 ];
 
