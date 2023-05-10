@@ -3,12 +3,21 @@ import styled from "styled-components";
 import axios from "../axios";
 import { toast } from "react-toastify";
 import { toastOption } from "../utils/toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function RoomsList() {
   const [roomCredeIsOpen, setRoomCreadeIsOpen] = React.useState(false);
   const [newRoomName, setNewRoomName] = React.useState("");
   const navigate = useNavigate();
+  const [allRooms, setAllRooms] = React.useState([]);
+
+  console.log(allRooms);
+
+  React.useEffect(() => {
+    axios.get(`/room`).then((res) => {
+      setAllRooms(res.data);
+    });
+  }, []);
 
   const roomCreateHandler = () => {
     if (newRoomName.length < 3) {
@@ -32,6 +41,15 @@ function RoomsList() {
             Создать комнату
           </button>
           <button>Зайти в комнату</button>
+        </div>
+        <div className="rooms-list">
+          <h3>Ваши комнаты</h3>
+          {allRooms.map((item) => (
+            <Link key={item._id} to={`/rooms/${item._id}`} className="room">
+              <h4>{item.name}</h4>
+              <p>Участников: {item.allUsers.length}</p>
+            </Link>
+          ))}
         </div>
       </Container>
       {roomCredeIsOpen && (
@@ -137,6 +155,28 @@ const Container = styled.div`
   padding-left: 1rem;
   h3 {
     text-align: center;
+  }
+  .rooms-list {
+    margin-top: 2rem;
+    h3 {
+      padding-bottom: 1rem;
+    }
+    .room {
+      text-decoration: none;
+      cursor: pointer;
+      padding: 1rem;
+      border: none;
+      outline: none;
+      background: rgb(106, 99, 212);
+      background: linear-gradient(90deg, #a8a6c0 0%, #d0edd5 0%, #e3f6fa 100%);
+      color: #3f4967;
+      font-weight: bold;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
   }
   .rooms-buttons {
     padding-top: 1rem;

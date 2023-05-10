@@ -5,9 +5,11 @@ import userIcon from "../assets/userIcon.png";
 import musicIcon from "../assets/musicIcon.png";
 import exitIcon from "../assets/exitIcon.png";
 import roomIcon from "../assets/roomIcon.png";
+import databaseIcon from "../assets/databaseIcon.png";
+import editIcon from "../assets/editIcon.png";
 
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
 
 const menuItem = [
@@ -32,6 +34,7 @@ const menuItem = [
 ];
 
 function Header() {
+  const userData = useSelector((store) => store.auth.data);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,6 +55,22 @@ function Header() {
             <h2>{item.name}</h2>
           </Link>
         ))}
+        {userData?.isAdmin && (
+          <>
+            <Link to="/track-add" className="menu-item">
+              <div className="menu-item__icon">
+                <img src={databaseIcon} alt="icon" />
+              </div>
+              <h2>Добавить песню</h2>
+            </Link>
+            <Link to="/edit" className="menu-item">
+              <div className="menu-item__icon">
+                <img src={editIcon} alt="icon" />
+              </div>
+              <h2>Редактировать</h2>
+            </Link>
+          </>
+        )}
       </div>
       <button className="exit" onClick={logoutHandler}>
         <img src={exitIcon} alt="" />

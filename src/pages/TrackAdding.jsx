@@ -5,8 +5,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { toastOption } from "../utils/toast";
 import noTrackPreview from "../assets/noMusicPreview.png";
+import { useParams } from "react-router-dom";
 
-function TrackAdding() {
+function TrackAdding({ edit }) {
+  const { id } = useParams();
   const [fields, setFields] = React.useState({
     name: "",
     author: "",
@@ -18,6 +20,23 @@ function TrackAdding() {
   });
   const previewRef = React.useRef(null);
   const trackRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (edit) {
+      axios.get(`/track/${id}`).then((res) => {
+        console.log(res.data);
+        setFields({
+          name: res.data.name,
+          author: res.data.author.join(","),
+          released: res.data.released,
+          genre: res.data.genre.join(","),
+          isRussian: res.data.isRussian,
+          previewPicture: res.data.previewPicture,
+          trackUrl: res.data.trackUrl,
+        });
+      });
+    }
+  }, []);
 
   const validateFieldTrack = () => {
     const { name, author, released, trackUrl } = fields;
@@ -33,7 +52,7 @@ function TrackAdding() {
       toast.error("Кажется вы забыли ввести год выхода", toastOption);
       return false;
     }
-    if (trackUrl === "") {
+    if (!edit && trackUrl === "") {
       toast.error("Кажется вы забыли загрузить аудио", toastOption);
       return false;
     }
@@ -41,7 +60,7 @@ function TrackAdding() {
   };
 
   const validateTrackFile = () => {
-    if (trackRef.current.files[0].type.indexOf("audio") === -1) {
+    if (!edit && trackRef.current.files[0].type.indexOf("audio") === -1) {
       trackRef.current.value = "";
       toast.error("Не верный формат аудио", toastOption);
       return false;
@@ -96,37 +115,52 @@ function TrackAdding() {
   const formSubmitHandler = (e) => {
     e.preventDefault();
     if (validateFieldTrack()) {
-      axios
-        .post("/track/add", {
-          name: fields.name,
-          author: fields.author.split(",").map((item) => item.trim()),
-          released: Number(fields.released),
-          genre: fields.genre.split(",").map((item) => item.trim()),
-          isRussian: Boolean(fields.isRussian),
-          previewPicture: fields.previewPicture,
-          trackUrl: fields.trackUrl,
-        })
-        .then(() => {
-          toast.success("Аудио загружено на сервер!", toastOption);
-          setFields({
-            name: "",
-            author: "",
-            released: "",
-            genre: "",
-            isRussian: true,
-            previewPicture: "",
-            trackUrl: "",
+      if (!edit) {
+        axios
+          .post("/track/add", {
+            name: fields.name,
+            author: fields.author.split(",").map((item) => item.trim()),
+            released: Number(fields.released),
+            genre: fields.genre.split(",").map((item) => item.trim()),
+            isRussian: Boolean(fields.isRussian),
+            previewPicture: fields.previewPicture,
+            trackUrl: fields.trackUrl,
+          })
+          .then(() => {
+            toast.success("Аудио загружено на сервер!", toastOption);
+            setFields({
+              name: "",
+              author: "",
+              released: "",
+              genre: "",
+              isRussian: true,
+              previewPicture: "",
+              trackUrl: "",
+            });
+            previewRef.current.value = "";
+            trackRef.current.value = "";
           });
-          previewRef.current.value = "";
-          trackRef.current.value = "";
-        });
+      } else {
+        axios
+          .patch(`/track/${id}`, {
+            name: fields.name,
+            author: fields.author.split(",").map((item) => item.trim()),
+            released: Number(fields.released),
+            genre: fields.genre.split(",").map((item) => item.trim()),
+            isRussian: Boolean(fields.isRussian),
+            previewPicture: fields.previewPicture,
+          })
+          .then(() => {
+            toast.success("Трек обновлен!", toastOption);
+          });
+      }
     }
   };
 
   return (
     <>
       <Container>
-        <h1>Добавление аудио</h1>
+        <h1>{edit ? `Редактирование аудио` : "Добавление аудио"}</h1>
         <div className="form">
           <form onSubmit={(e) => formSubmitHandler(e)}>
             <div className="form-input">
@@ -193,11 +227,17 @@ function TrackAdding() {
                 alt="preview"
               />
             </div>
-            <div className="form-track">
-              <p>Выберите аудио</p>
-              <input type="file" ref={trackRef} onChange={postTrackOnServer} />
-            </div>
-            <button type="submit">Загрузить</button>
+            {!edit && (
+              <div className="form-track">
+                <p>Выберите аудио</p>
+                <input
+                  type="file"
+                  ref={trackRef}
+                  onChange={postTrackOnServer}
+                />
+              </div>
+            )}
+            <button type="submit">{edit ? "Обновить" : "Загрузить"}</button>
           </form>
         </div>
       </Container>

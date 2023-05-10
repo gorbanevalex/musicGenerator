@@ -1,13 +1,19 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import styled from "styled-components";
+import axios from "../axios";
 import TrackItem from "./TrackItem";
 
-function PLaylist() {
-  const userData = useSelector((store) => store.auth.data);
+import styled from "styled-components";
+
+function EditPlaylist() {
   const [tracks, setTracks] = React.useState([]);
-  const [activeTrack, setActiveTrack] = React.useState("");
+  const [activeTrack, setActiveTrack] = React.useState();
   const [searchValue, setSearchValue] = React.useState("");
+
+  React.useEffect(() => {
+    axios.get("/track/all").then((res) => {
+      setTracks(res.data);
+    });
+  }, []);
 
   const filteredSearchTracks =
     searchValue.length > 0
@@ -29,14 +35,9 @@ function PLaylist() {
         })
       : tracks;
 
-  React.useEffect(() => {
-    if (userData?.likedTrack) {
-      setTracks(userData.likedTrack);
-    }
-  }, [userData]);
-
   return (
     <Container>
+      <h1>Редактируйте треки, добавленные в приложение</h1>
       <div className="playlist-search">
         <input
           type="text"
@@ -52,22 +53,22 @@ function PLaylist() {
             track={item}
             activeTrack={activeTrack}
             changeActiveTrack={setActiveTrack}
-            editable={false}
+            editable={true}
           />
         ))}
-        {tracks.length === 0 && (
-          <p className="empty-list">
-            Добавьте музыку в свой плейлист во вкладке "Профиль"
-          </p>
-        )}
       </div>
     </Container>
   );
 }
 
 const Container = styled.div`
-  padding-left: 1rem;
+  padding: 0 1rem;
+  h1 {
+    font-size: 1rem;
+    text-align: center;
+  }
   .playlist-search {
+    padding: 1rem 0;
     input {
       width: 100%;
       padding: 1rem;
@@ -78,14 +79,6 @@ const Container = styled.div`
       }
     }
   }
-  .content {
-    margin-top: 1rem;
-    .empty-list {
-      text-align: center;
-      font-weight: 600;
-      font-size: 14px;
-    }
-  }
 `;
 
-export default PLaylist;
+export default EditPlaylist;

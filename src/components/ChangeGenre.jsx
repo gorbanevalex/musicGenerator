@@ -12,10 +12,15 @@ function ChangeGenre() {
   const userData = useSelector((store) => store.auth.data);
   const [userGenre, setUserGenre] = React.useState([]);
   const [allGenre, setAllGenre] = React.useState([]);
+  const [genreNotAdded, setGenreNotAdded] = React.useState([]);
 
-  const genreNotAdded = allGenre.filter((item) => {
-    return userGenre.indexOf(item) === -1;
-  });
+  React.useEffect(() => {
+    setGenreNotAdded(
+      allGenre.filter((item) => {
+        return userGenre.indexOf(item) === -1;
+      })
+    );
+  }, [userGenre, allGenre]);
 
   React.useEffect(() => {
     if (userData?.likedGenre) {
@@ -31,7 +36,6 @@ function ChangeGenre() {
 
   const addGenreHandler = (genre) => {
     axios.patch("/auth/genre", { genre }).then((res) => {
-      setAllGenre(allGenre.filter((item) => item !== genre));
       dispatch(login(res.data));
     });
   };
@@ -39,7 +43,6 @@ function ChangeGenre() {
   const removeGenreHandler = (genre) => {
     axios.delete(`/auth/genre/${genre}`).then((res) => {
       dispatch(login(res.data));
-      setAllGenre((prev) => [genre, ...prev]);
     });
   };
 

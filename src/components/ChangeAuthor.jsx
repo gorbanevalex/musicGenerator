@@ -13,10 +13,15 @@ function ChangeAuthor() {
   const userData = useSelector((store) => store.auth.data);
   const [allAuthor, setAllAuthor] = React.useState([]);
   const [userAuthor, setUserAuthor] = React.useState([]);
+  const [authorNotAdded, setAuthorNotAdded] = React.useState([]);
 
-  const authorNotAdded = allAuthor.filter((item) => {
-    return userAuthor.indexOf(item) === -1;
-  });
+  React.useEffect(() => {
+    setAuthorNotAdded(
+      allAuthor.filter((item) => {
+        return userAuthor.indexOf(item) === -1;
+      })
+    );
+  }, [userAuthor, allAuthor]);
 
   React.useEffect(() => {
     if (userData?.likedAuthor) {
@@ -31,7 +36,6 @@ function ChangeAuthor() {
 
   const addAuthorHandler = (author) => {
     axios.patch("/auth/author", { author }).then((res) => {
-      setAllAuthor(allAuthor.filter((item) => item !== author));
       dispatch(login(res.data));
     });
   };
@@ -39,7 +43,6 @@ function ChangeAuthor() {
   const removeAuthorHandler = (author) => {
     axios.delete(`/auth/author/${author}`).then((res) => {
       dispatch(login(res.data));
-      setAllAuthor((prev) => [author, ...prev]);
     });
   };
 

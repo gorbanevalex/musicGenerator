@@ -1,14 +1,17 @@
 import React from "react";
 import axios from "../axios";
-import { toast } from "react-toastify";
 
+import editIcon from "../assets/editIcon.png";
 import playIcon from "../assets/playButton.png";
 import playGif from "../assets/musicPlay.gif";
 import addIcon from "../assets/add.png";
 import addedIcon from "../assets/check.png";
+import basketIcon from "../assets/basket.png";
+
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const useAudio = (audio, activeTrack) => {
   const [playing, setPlaying] = React.useState(false);
@@ -32,7 +35,8 @@ const useAudio = (audio, activeTrack) => {
   return [playing, toggle, pause];
 };
 
-function TrackItem({ track, activeTrack, changeActiveTrack }) {
+function TrackItem({ track, activeTrack, changeActiveTrack, editable }) {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const userData = useSelector((store) => store.auth.data);
   const [isAdded, setIsAdded] = React.useState(false);
@@ -85,8 +89,14 @@ function TrackItem({ track, activeTrack, changeActiveTrack }) {
     }
   };
 
+  const removeTrackHandler = () => {
+    axios.delete(`/track/${track._id}`).then((res) => {
+      setDuration("");
+    });
+  };
+
   return (
-    <TrackContainer>
+    <TrackContainer className={duration.length === 0 && "off"}>
       <Container onClick={onPlayClickHandler}>
         <div className={`track-preview ${playing && "active"}`}>
           <img src={playIcon} alt="" className="play-icon" />
@@ -101,13 +111,24 @@ function TrackItem({ track, activeTrack, changeActiveTrack }) {
           <p>{duration}</p>
         </div>
       </Container>
-      <button className="add" onClick={addTrackHandler}>
-        {!isAdded ? (
-          <img src={addIcon} alt="" />
-        ) : (
-          <img src={addedIcon} alt="" />
-        )}
-      </button>
+      {!editable ? (
+        <button className="add" onClick={addTrackHandler}>
+          {!isAdded && duration.length !== 0 && <img src={addIcon} alt="" />}
+          {isAdded && <img src={addedIcon} alt="" />}
+        </button>
+      ) : (
+        <>
+          <button className="add" onClick={removeTrackHandler}>
+            {duration.length !== 0 && <img src={basketIcon} alt="" />}
+          </button>
+          <button
+            className="add"
+            onClick={() => navigate(`/edit/${track._id}`)}
+          >
+            {duration.length !== 0 && <img src={editIcon} alt="" />}
+          </button>
+        </>
+      )}
     </TrackContainer>
   );
 }
@@ -116,6 +137,9 @@ const TrackContainer = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  &.off {
+    opacity: 0.3;
+  }
   .add {
     height: 2rem;
     cursor: pointer;

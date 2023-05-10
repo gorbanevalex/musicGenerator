@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Navigate, Route, Routes } from "react-router-dom";
 import axios from "../axios";
 import { login } from "../redux/slices/authSlice";
@@ -15,8 +15,10 @@ import Header from "./Header";
 import PLaylist from "./PLaylist";
 import RoomsList from "./RoomsList";
 import Room from "./Room";
+import EditPlaylist from "./EditPlaylist";
 
 function CheckAuth() {
+  const userData = useSelector((store) => store.auth.data);
   const dispatch = useDispatch();
   const socket = React.useRef();
 
@@ -44,6 +46,11 @@ function CheckAuth() {
             <Route path="playlist" element={<PLaylist />} />
             <Route path="rooms" element={<RoomsList />} />
             <Route path="rooms/:id" element={<Room socket={socket} />} />
+            {userData?.isAdmin && (
+              <>
+                <Route path="edit" element={<EditPlaylist />} />
+              </>
+            )}
           </Routes>
         </div>
       </Container>
@@ -80,7 +87,7 @@ const Container = styled.div`
     }
   }
   .header-block {
-    flex: 0 0 180px;
+    flex: 0 0 190px;
   }
   .content-block {
     flex: 1 1 auto;

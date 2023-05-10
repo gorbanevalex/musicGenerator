@@ -65,6 +65,7 @@ function ChangeTrack() {
             track={item}
             activeTrack={activeTrack}
             changeActiveTrack={setActiveTrack}
+            editable={false}
           />
         ))}
       </div>
