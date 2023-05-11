@@ -54,11 +54,28 @@ function TrackItem({ track, activeTrack, changeActiveTrack, editable }) {
     new Audio(`http://localhost:8000${track.trackUrl}`)
   );
   const [duration, setDuration] = React.useState("");
+  const [currentTime, setCurrentTime] = React.useState(0);
 
   const [playing, toggle, pause] = useAudio(audio, activeTrack);
   if (activeTrack !== track._id && playing) {
     pause();
   }
+
+  React.useEffect(() => {
+    let timer;
+    if (playing) {
+      timer = setInterval(() => {
+        setCurrentTime((prevState) => prevState + 1);
+      }, 1000);
+    } else {
+      clearInterval(timer);
+      console.log("not play");
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [playing]);
 
   React.useEffect(() => {
     audio.onloadedmetadata = () => {
@@ -109,6 +126,9 @@ function TrackItem({ track, activeTrack, changeActiveTrack, editable }) {
         </div>
         <div className="track-duration">
           <p>{duration}</p>
+          <p>{`${Math.floor(currentTime / 60)} : ${Math.round(
+            currentTime - Math.floor(currentTime / 60) * 60
+          )}`}</p>
         </div>
       </Container>
       {!editable ? (
